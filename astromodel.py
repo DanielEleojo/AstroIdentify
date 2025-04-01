@@ -2,6 +2,8 @@ import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import random
+import numpy as np
 
 from torchvision import datasets, models, transforms
 from torchvision.models import resnet18, ResNet18_Weights
@@ -10,48 +12,45 @@ from torch.optim.lr_scheduler import StepLR
 
 from collections import Counter
 
+def set_seed(seed=42):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+set_seed()
+
 def train_model():
     
-    '''
-    # Image transformations 
-    train_transforms = transforms.Compose([
-        transforms.Resize((224, 224)),    # Resize to match ResNet’s expected size
-        #transforms.RandomRotation(10),   #Experimental
-        #transforms.RandomHorizontalFlip(), # Light augmentation Experimental
-        #transforms.ColorJitter(brightness=0.1, contrast=0.1), #Experimental       
-        transforms.ToTensor(),
-        transforms.Normalize(
-            mean=[0.485, 0.456, 0.406],   # ImageNet means
-            std=[0.229, 0.224, 0.225]     # ImageNet stds
-        )
-    ])
-
-    val_transforms = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize(
-            mean=[0.485, 0.456, 0.406],
-            std=[0.229, 0.224, 0.225]
-        )
-    ])
-    '''
-    
      # === Transforms === (no strong augmentations)
-    base_transforms = transforms.Compose([
+    train_transforms = transforms.Compose([
         transforms.Resize((224, 224)),
+        transforms.RandomHorizontalFlip(p=0.5),      # Flip stars left ↔ right
+        transforms.RandomRotation(degrees=5),        # Small rotation
+        transforms.ColorJitter(brightness=0.1, contrast=0.1),  # Light brightness/contrast jitter
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406],
                              [0.229, 0.224, 0.225])
     ])
+    
+    val_transforms = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406],
+                            [0.229, 0.224, 0.225])
+    ])
+
     
     # Path to your dataset
     data_dir = r"C:\Users\DBABA\OneDrive\Documents\Data Science Projects\AstroIdentify\Constalations-Classification-1"
 
 
     # Create datasets
-    train_dataset = datasets.ImageFolder(os.path.join(data_dir, 'train'), transform=base_transforms)
-    val_dataset   = datasets.ImageFolder(os.path.join(data_dir, 'valid'),   transform=base_transforms)
-    test_dataset  = datasets.ImageFolder(os.path.join(data_dir, 'test'),  transform=base_transforms)
+    train_dataset = datasets.ImageFolder(os.path.join(data_dir, 'train'), transform=train_transforms)
+    val_dataset   = datasets.ImageFolder(os.path.join(data_dir, 'valid'),   transform=val_transforms)
+    test_dataset  = datasets.ImageFolder(os.path.join(data_dir, 'test'),  transform=val_transforms)
     
         # Check class counts
     labels = [label for _, label in train_dataset]
@@ -86,19 +85,17 @@ def train_model():
     # ResNet18’s last layer is `model.fc`, which outputs 1000 classes by default (for ImageNet)
     
     
-    model.fc = nn.Linear(model.fc.in_features, num_classes)
+    #model.fc = nn.Linear(model.fc.in_features, num_classes)
     
-    '''
-    Experimental
+    # Experimental
     
     num_features = model.fc.in_features
     model.fc = nn.Sequential(
-        nn.Dropout(p=0.3),                      # ← Add dropout before FC layer
+        nn.Dropout(p=0.2),                      # ← Add dropout before FC layer
         nn.Linear(num_features, num_classes)
     )
-    '''
+    
        
-
     # Move the model to GPU if available
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device)
@@ -175,9 +172,9 @@ def train_model():
 
     test_acc = 100.0 * test_correct / test_total
     print(f"Test Accuracy: {test_acc:.2f}%")
-    #torch.save(model.state_dict(), "constellation_base_model.pt")
+    torch.save(model.state_dict(), "constellation_best_model.pt")
     
-    return model, base_transforms, train_dataset.classes
+    return model, val_transforms, train_dataset.classes
 
 from PIL import Image
 
@@ -195,13 +192,19 @@ def predict_image(model, image_path, transform, class_names, device):
 if __name__ == '__main__':
     import torch.multiprocessing
     torch.multiprocessing.freeze_support()
-
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    inference_transforms = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406],
+                            [0.229, 0.224, 0.225])
+    ])
     # Step 1: Train the model and get what you need
-    model, base_transforms, class_names = train_model()
+    model, inference_transforms, class_names = train_model()
 
     # Step 2: Predict on new image
     test_image_path = r'C:\Users\DBABA\OneDrive\Documents\Data Science Projects\AstroIdentify\denoise_testing\Aquarius_input.png'
-    prediction = predict_image(model, test_image_path, base_transforms, class_names, device)
+    prediction = predict_image(model, test_image_path, inference_transforms, class_names, device)
     print("Predicted Constellation:", prediction)
     
