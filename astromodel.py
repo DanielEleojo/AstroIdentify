@@ -4,12 +4,16 @@ import torch.nn as nn
 import torch.optim as optim
 
 from torchvision import datasets, models, transforms
+from torchvision.models import resnet18, ResNet18_Weights
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import StepLR
 
+from collections import Counter
 
 def train_model():
-    # Image transformations
+    
+    '''
+    # Image transformations 
     train_transforms = transforms.Compose([
         transforms.Resize((224, 224)),    # Resize to match ResNet’s expected size
         #transforms.RandomRotation(10),   #Experimental
@@ -30,15 +34,27 @@ def train_model():
             std=[0.229, 0.224, 0.225]
         )
     ])
-
+    '''
+    
+     # === Transforms === (no strong augmentations)
+    base_transforms = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406],
+                             [0.229, 0.224, 0.225])
+    ])
+    
     # Path to your dataset
     data_dir = r"C:\Users\DBABA\OneDrive\Documents\Data Science Projects\AstroIdentify\Constalations-Classification-1"
 
 
     # Create datasets
-    train_dataset = datasets.ImageFolder(os.path.join(data_dir, 'train'), transform=train_transforms)
-    val_dataset   = datasets.ImageFolder(os.path.join(data_dir, 'valid'),   transform=val_transforms)
-    test_dataset  = datasets.ImageFolder(os.path.join(data_dir, 'test'),  transform=val_transforms)
+    train_dataset = datasets.ImageFolder(os.path.join(data_dir, 'train'), transform=base_transforms)
+    val_dataset   = datasets.ImageFolder(os.path.join(data_dir, 'valid'),   transform=base_transforms)
+    test_dataset  = datasets.ImageFolder(os.path.join(data_dir, 'test'),  transform=base_transforms)
+    
+        # Check class counts
+    labels = [label for _, label in train_dataset]
 
     # Create loaders
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=2)
@@ -50,12 +66,22 @@ def train_model():
     #print("Classes:", train_dataset.classes)
 
     # Load pretrained ResNet
-    model = models.resnet18(pretrained=True)
+    weights = ResNet18_Weights.DEFAULT
+    model = resnet18(weights=weights)
 
     # Freeze all layers if you only want to train the final layer:
     for param in model.parameters():
         param.requires_grad = False
-
+    
+    '''
+    for param in model.fc.parameters():
+        param.requires_grad = True
+    '''
+    
+    for name, param in model.named_parameters():
+        if "layer4" in name or "fc" in name:
+            param.requires_grad = True
+            
     # Replace the final classification layer (fully connected)
     # ResNet18’s last layer is `model.fc`, which outputs 1000 classes by default (for ImageNet)
     
@@ -80,13 +106,13 @@ def train_model():
     criterion = nn.CrossEntropyLoss()
 
     # Since we replaced only the final layer, we only pass the final layer’s parameters to the optimizer.
-    optimizer = optim.Adam(model.fc.parameters(), lr=1e-4)
-    scheduler = StepLR(optimizer, step_size=3, gamma=0.5)  #Experimental
+    #optimizer = optim.Adam(model.fc.parameters(), lr=1e-3)
+    #scheduler = StepLR(optimizer, step_size=3, gamma=0.5)  #Experimental
 
     # If you decide to unfreeze more layers, pass those parameters as well:
-    # optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=1e-4)
+    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=1e-4)
 
-    num_epochs = 10
+    num_epochs = 15
 
     for epoch in range(num_epochs):
         model.train()
@@ -108,7 +134,7 @@ def train_model():
             correct += (predicted == labels).sum().item()
             total += labels.size(0)
         
-        scheduler.step()   #Experimental
+        #scheduler.step()   #Experimental
         epoch_loss = running_loss / total
         epoch_acc = 100.0 * correct / total
         
@@ -149,8 +175,9 @@ def train_model():
 
     test_acc = 100.0 * test_correct / test_total
     print(f"Test Accuracy: {test_acc:.2f}%")
+    #torch.save(model.state_dict(), "constellation_base_model.pt")
     
-    return model, val_transforms, train_dataset.classes
+    return model, base_transforms, train_dataset.classes
 
 from PIL import Image
 
@@ -171,10 +198,10 @@ if __name__ == '__main__':
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # Step 1: Train the model and get what you need
-    model, val_transforms, class_names = train_model()
+    model, base_transforms, class_names = train_model()
 
     # Step 2: Predict on new image
     test_image_path = r'C:\Users\DBABA\OneDrive\Documents\Data Science Projects\AstroIdentify\denoise_testing\Aquarius_input.png'
-    prediction = predict_image(model, test_image_path, val_transforms, class_names, device)
+    prediction = predict_image(model, test_image_path, base_transforms, class_names, device)
     print("Predicted Constellation:", prediction)
     
