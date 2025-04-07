@@ -41,10 +41,13 @@ def predict_image(model, image_path, transform, class_names):
         probs = F.softmax(outputs, dim=1)
         confidence, predicted = torch.max(probs, 1)
 
-
+        confidences, indices = torch.topk(probs, 3)
+        for i in range(3):
+            print(f"{class_names[indices[0][i]]}: {confidences[0][i].item():.2%}")
+            
         predicted_class = class_names[predicted.item()]
     return predicted_class, confidence.item()
 
-image_path = "denoise_testing/thresholded_denoised_gemini_constellation.jpg"
+image_path = "denoise_testing/thresholded_denoised_aquarius_constellation_2.jpg"
 prediction = predict_image(model, image_path, inference_transforms, class_names)
 print("Predicted Constellation:", prediction)
