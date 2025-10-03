@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="display-4 mb-4">
+                        <i class="fas fa-star text-primary"></i>
+                        Discover the Stars
+                    </h1>
+                    <p class="lead mb-4">
+                        Upload an image of a constellation and let our AI-powered classifier identify it for you. 
+                        Using state-of-the-art deep learning technology to recognize 12 different constellations.
+                    </p>
+                    <div class="constellation-list mb-4">
+                        <h6>Supported Constellations:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled constellation-grid">
+                                    <li><i class="fas fa-star-of-life text-warning"></i> Aquarius</li>
+                                    <li><i class="fas fa-star-of-life text-warning"></i> Aries</li>
+                                    <li><i class="fas fa-star-of-life text-warning"></i> Cancer</li>
+                                    <li><i class="fas fa-star-of-life text-warning"></i> Capricornus</li>
+                                    <li><i class="fas fa-star-of-life text-warning"></i> Gemini</li>
+                                    <li><i class="fas fa-star-of-life text-warning"></i> Leo</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled constellation-grid">
+                                    <li><i class="fas fa-star-of-life text-warning"></i> Libra</li>
+                                    <li><i class="fas fa-star-of-life text-warning"></i> Pisces</li>
+                                    <li><i class="fas fa-star-of-life text-warning"></i> Sagittarius</li>
+                                    <li><i class="fas fa-star-of-life text-warning"></i> Scorpius</li>
+                                    <li><i class="fas fa-star-of-life text-warning"></i> Taurus</li>
+                                    <li><i class="fas fa-star-of-life text-warning"></i> Virgo</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="upload-section">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-body p-5">
+                            <h3 class="card-title text-center mb-4">
+                                <i class="fas fa-cloud-upload-alt text-primary"></i>
+                                Upload Constellation Image
+                            </h3>
+                            
+                            <form method="POST" action="{{ url_for('upload_file') }}" enctype="multipart/form-data" id="uploadForm">
+                                <div class="upload-area" id="uploadArea">
+                                    <div class="upload-content">
+                                        <i class="fas fa-image fa-3x text-muted mb-3"></i>
+                                        <h5>Drag & Drop your image here</h5>
+                                        <p class="text-muted">or click to browse</p>
+                                        <input type="file" name="file" id="fileInput" accept="image/*" required style="display: none;">
+                                        <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('fileInput').click()">
+                                            Choose File
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="file-info mt-3" id="fileInfo" style="display: none;">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-file-image text-primary me-2"></i>
+                                        <span id="fileName"></span>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" onclick="clearFile()">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="image-preview mt-3" id="imagePreview" style="display: none;">
+                                    <img id="previewImg" class="img-fluid rounded" alt="Preview">
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary btn-lg w-100 mt-3" id="submitBtn" disabled>
+                                    <i class="fas fa-search"></i> Identify Constellation
+                                </button>
+                            </form>
+                            
+                            <div class="text-center mt-3">
+                                <small class="text-muted">
+                                    Supported formats: PNG, JPG, JPEG, GIF, BMP, TIFF (Max: 16MB)
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-5">
+                <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <h5>Analyzing your constellation image...</h5>
+                <p class="text-muted">This may take a few moments</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<section class="features-section py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-lg-4 mb-4">
+                <div class="feature-box">
+                    <i class="fas fa-brain fa-3x text-primary mb-3"></i>
+                    <h4>AI-Powered</h4>
+                    <p>Uses advanced ResNet18 deep learning architecture trained specifically for constellation recognition.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="feature-box">
+                    <i class="fas fa-bolt fa-3x text-warning mb-3"></i>
+                    <h4>Fast & Accurate</h4>
+                    <p>Get instant results with high accuracy classification of your constellation images.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="feature-box">
+                    <i class="fas fa-mobile-alt fa-3x text-success mb-3"></i>
+                    <h4>Easy to Use</h4>
+                    <p>Simple drag-and-drop interface that works on all devices. No technical knowledge required.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// File upload handling
+document.getElementById('uploadForm').addEventListener('submit', function() {
+    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    loadingModal.show();
+});
+
+// Drag and drop functionality
+const uploadArea = document.getElementById('uploadArea');
+const fileInput = document.getElementById('fileInput');
+
+uploadArea.addEventListener('click', () => fileInput.click());
+
+uploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadArea.classList.add('dragover');
+});
+
+uploadArea.addEventListener('dragleave', () => {
+    uploadArea.classList.remove('dragover');
+});
+
+uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        fileInput.files = files;
+        handleFileSelect();
+    }
+});
+
+fileInput.addEventListener('change', handleFileSelect);
+
+function handleFileSelect() {
+    const file = fileInput.files[0];
+    if (file) {
+        const fileName = document.getElementById('fileName');
+        const fileInfo = document.getElementById('fileInfo');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        fileName.textContent = file.name;
+        fileInfo.style.display = 'block';
+        submitBtn.disabled = false;
+        
+        // Show image preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            imagePreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function clearFile() {
+    fileInput.value = '';
+    document.getElementById('fileInfo').style.display = 'none';
+    document.getElementById('imagePreview').style.display = 'none';
+    document.getElementById('submitBtn').disabled = true;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found - AstroIdentify{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="error-page">
+                <div class="error-icon mb-4">
+                    <i class="fas fa-satellite-dish fa-5x text-muted"></i>
+                </div>
+                <h1 class="display-1 text-primary">404</h1>
+                <h2 class="mb-3">Lost in Space!</h2>
+                <p class="lead text-muted mb-4">
+                    The constellation you're looking for seems to have drifted into another galaxy. 
+                    Let's navigate you back to familiar stars.
+                </p>
+                <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-home"></i>
+                    Return to Earth
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

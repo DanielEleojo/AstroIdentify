@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}About - AstroIdentify{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-4">
+                    <i class="fas fa-star text-primary"></i>
+                    About AstroIdentify
+                </h1>
+                <p class="lead">Learn more about our constellation classification system</p>
+            </div>
+
+            <!-- Project Overview -->
+            <div class="card shadow border-0 mb-4">
+                <div class="card-body p-5">
+                    <h2 class="text-primary mb-4">
+                        <i class="fas fa-telescope"></i>
+                        Project Overview
+                    </h2>
+                    <p class="lead">
+                        AstroIdentify is an AI-powered constellation classification system that uses deep learning 
+                        to identify constellations from astronomical images. Built with state-of-the-art computer 
+                        vision techniques, it can accurately classify 12 different constellations.
+                    </p>
+                    <p>
+                        Whether you're an astronomy enthusiast, student, or professional, AstroIdentify makes 
+                        constellation identification accessible and instant. Simply upload an image, and our 
+                        trained neural network will analyze the star patterns and provide you with accurate 
+                        classification results.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Technical Details -->
+            {% if model_info %}
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-cog"></i>
+                        Technical Specifications
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="tech-spec mb-3">
+                                <h6><i class="fas fa-brain text-primary"></i> Model Architecture</h6>
+                                <p class="text-muted">{{ model_info.model_architecture }}</p>
+                            </div>
+                            <div class="tech-spec mb-3">
+                                <h6><i class="fas fa-layer-group text-success"></i> Number of Classes</h6>
+                                <p class="text-muted">{{ model_info.num_classes }} constellations</p>
+                            </div>
+                            <div class="tech-spec mb-3">
+                                <h6><i class="fas fa-image text-info"></i> Input Size</h6>
+                                <p class="text-muted">{{ model_info.input_size[0] }}x{{ model_info.input_size[1] }} pixels</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="tech-spec mb-3">
+                                <h6><i class="fas fa-microchip text-warning"></i> Processing Device</h6>
+                                <p class="text-muted">{{ model_info.device }}</p>
+                            </div>
+                            <div class="tech-spec mb-3">
+                                <h6><i class="fas fa-tags text-secondary"></i> Supported Classes</h6>
+                                <div class="constellation-tags">
+                                    {% for class_name in model_info.class_names %}
+                                    <span class="badge bg-primary me-1 mb-1">{{ class_name }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- How It Works -->
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-question-circle"></i>
+                        How It Works
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center mb-4">
+                            <div class="process-step">
+                                <div class="step-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-upload fa-2x"></i>
+                                </div>
+                                <h5>1. Upload</h5>
+                                <p class="text-muted">Upload your constellation image through our user-friendly interface</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center mb-4">
+                            <div class="process-step">
+                                <div class="step-icon bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-cog fa-2x"></i>
+                                </div>
+                                <h5>2. Process</h5>
+                                <p class="text-muted">Our AI preprocesses the image and extracts relevant features</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center mb-4">
+                            <div class="process-step">
+                                <div class="step-icon bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-brain fa-2x"></i>
+                                </div>
+                                <h5>3. Analyze</h5>
+                                <p class="text-muted">Deep learning model analyzes star patterns and shapes</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center mb-4">
+                            <div class="process-step">
+                                <div class="step-icon bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-star fa-2x"></i>
+                                </div>
+                                <h5>4. Identify</h5>
+                                <p class="text-muted">Get instant results with confidence scores and details</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-star"></i>
+                        Key Features
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-3">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    <strong>High Accuracy:</strong> Trained on extensive constellation datasets
+                                </li>
+                                <li class="mb-3">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    <strong>Fast Processing:</strong> Get results in seconds
+                                </li>
+                                <li class="mb-3">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    <strong>Multiple Formats:</strong> Supports PNG, JPG, JPEG, GIF, BMP, TIFF
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-3">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    <strong>Confidence Scores:</strong> Know how certain the prediction is
+                                </li>
+                                <li class="mb-3">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    <strong>Top-5 Predictions:</strong> See alternative possibilities
+                                </li>
+                                <li class="mb-3">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    <strong>Educational Info:</strong> Learn about each constellation
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technology Stack -->
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-code"></i>
+                        Technology Stack
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Backend</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fab fa-python text-primary"></i> Python 3.8+</li>
+                                <li><i class="fas fa-fire text-danger"></i> PyTorch</li>
+                                <li><i class="fas fa-flask text-success"></i> Flask Web Framework</li>
+                                <li><i class="fas fa-image text-info"></i> PIL/Pillow</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Frontend</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fab fa-html5 text-danger"></i> HTML5</li>
+                                <li><i class="fab fa-css3-alt text-primary"></i> CSS3</li>
+                                <li><i class="fab fa-js-square text-warning"></i> JavaScript</li>
+                                <li><i class="fab fa-bootstrap text-purple"></i> Bootstrap 5</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Usage Tips -->
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">
+                        <i class="fas fa-lightbulb"></i>
+                        Usage Tips
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>For Best Results:</h6>
+                            <ul>
+                                <li>Use clear, high-contrast images</li>
+                                <li>Ensure constellation patterns are visible</li>
+                                <li>Avoid overly cluttered star fields</li>
+                                <li>Center the constellation in the image</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Supported Formats:</h6>
+                            <ul>
+                                <li>PNG (recommended for clarity)</li>
+                                <li>JPG/JPEG (most common)</li>
+                                <li>GIF, BMP, TIFF also supported</li>
+                                <li>Maximum file size: 16MB</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="text-center">
+                <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-rocket"></i>
+                    Try AstroIdentify Now
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

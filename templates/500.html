@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error - AstroIdentify{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="error-page">
+                <div class="error-icon mb-4">
+                    <i class="fas fa-meteor fa-5x text-danger"></i>
+                </div>
+                <h1 class="display-1 text-danger">500</h1>
+                <h2 class="mb-3">Houston, We Have a Problem!</h2>
+                <p class="lead text-muted mb-4">
+                    Our servers encountered an unexpected meteor shower. Our engineering team 
+                    has been notified and is working to restore service.
+                </p>
+                <div class="mb-4">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg me-2">
+                        <i class="fas fa-home"></i>
+                        Go Home
+                    </a>
+                    <button onclick="history.back()" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-arrow-left"></i>
+                        Go Back
+                    </button>
+                </div>
+                <p class="text-muted">
+                    <small>If the problem persists, please try again in a few minutes.</small>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

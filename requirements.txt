@@ -1,0 +1,23 @@
+# AstroIdentify Web Application Requirements
+
+# Core Framework
+Flask==2.3.3
+Werkzeug==2.3.7
+
+# Deep Learning
+torch>=1.13.0
+torchvision>=0.14.0
+
+# Image Processing
+Pillow>=9.5.0
+numpy>=1.24.0
+
+# Utilities
+python-dotenv==1.0.0
+
+# Development (optional)
+flask-cors==4.0.0
+
+# Note: If you encounter CUDA compatibility issues, you may need to install
+# CPU-only versions of PyTorch:
+# pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu

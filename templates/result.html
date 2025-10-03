@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block title %}Results - AstroIdentify{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Results Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-5">
+                    <i class="fas fa-star text-warning"></i>
+                    Constellation Identified!
+                </h1>
+                <p class="lead text-muted">{{ data.timestamp }}</p>
+            </div>
+
+            <!-- Main Result Card -->
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-body p-4">
+                    <div class="row">
+                        <!-- Image Display -->
+                        <div class="col-md-6">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-image text-primary"></i>
+                                Your Image
+                            </h5>
+                            <div class="image-container">
+                                <img src="data:image/jpeg;base64,{{ data.image_data }}" 
+                                     class="img-fluid rounded shadow-sm" 
+                                     alt="Uploaded constellation image"
+                                     style="max-height: 400px; width: 100%; object-fit: contain;">
+                            </div>
+                        </div>
+                        
+                        <!-- Prediction Results -->
+                        <div class="col-md-6">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-search text-success"></i>
+                                Classification Results
+                            </h5>
+                            
+                            <!-- Main Prediction -->
+                            <div class="prediction-result bg-light p-4 rounded mb-4">
+                                <div class="text-center">
+                                    <i class="fas fa-star-of-life text-warning fa-3x mb-3"></i>
+                                    <h2 class="text-primary">{{ data.prediction.predicted_constellation }}</h2>
+                                    <div class="confidence-badge">
+                                        <span class="badge bg-success fs-6 px-3 py-2">
+                                            {{ data.prediction.confidence_percent }} Confidence
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Confidence Bar -->
+                            <div class="mb-4">
+                                <label class="form-label">Confidence Level</label>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar bg-success" 
+                                         role="progressbar" 
+                                         style="width: {{ (data.prediction.confidence * 100)|round }}%"
+                                         aria-valuenow="{{ (data.prediction.confidence * 100)|round }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                        {{ data.prediction.confidence_percent }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Predictions -->
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list"></i>
+                        Top 5 Predictions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for prediction in data.prediction.top_predictions %}
+                        <div class="col-md-6 mb-3">
+                            <div class="prediction-item d-flex align-items-center p-3 rounded 
+                                        {% if loop.index == 1 %}bg-success text-white{% else %}bg-light{% endif %}">
+                                <div class="prediction-rank me-3">
+                                    <span class="badge {% if loop.index == 1 %}bg-warning text-dark{% else %}bg-secondary{% endif %} fs-6">
+                                        #{{ loop.index }}
+                                    </span>
+                                </div>
+                                <div class="prediction-info flex-grow-1">
+                                    <h6 class="mb-1">{{ prediction.constellation }}</h6>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar {% if loop.index == 1 %}bg-warning{% else %}bg-primary{% endif %}" 
+                                             style="width: {{ (prediction.confidence * 100)|round }}%"></div>
+                                    </div>
+                                </div>
+                                <div class="prediction-confidence ms-3">
+                                    <strong>{{ prediction.confidence_percent }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Constellation Information -->
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle"></i>
+                        About {{ data.prediction.predicted_constellation }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="constellation-info">
+                        {% set constellation_info = {
+                            'Aquarius': {
+                                'description': 'The Water Bearer - A large constellation representing the cup-bearer of the gods.',
+                                'season': 'Best visible in autumn',
+                                'stars': 'Notable stars include Sadalsuud and Sadalmelik'
+                            },
+                            'Aries': {
+                                'description': 'The Ram - One of the zodiac constellations, representing the golden fleece.',
+                                'season': 'Best visible in autumn and early winter',
+                                'stars': 'Contains the bright star Hamal'
+                            },
+                            'Cancer': {
+                                'description': 'The Crab - A faint zodiac constellation containing the famous Beehive Cluster.',
+                                'season': 'Best visible in late winter and spring',
+                                'stars': 'Contains the open star cluster M44'
+                            },
+                            'Capricornus': {
+                                'description': 'The Sea Goat - A zodiac constellation representing a mythical creature.',
+                                'season': 'Best visible in late summer and early autumn',
+                                'stars': 'Contains the stars Deneb Algedi and Nashira'
+                            },
+                            'Gemini': {
+                                'description': 'The Twins - Famous for its bright twin stars Castor and Pollux.',
+                                'season': 'Best visible in winter and spring',
+                                'stars': 'Notable for Castor and Pollux, the twin stars'
+                            },
+                            'Leo': {
+                                'description': 'The Lion - A prominent zodiac constellation with a distinctive lion shape.',
+                                'season': 'Best visible in spring',
+                                'stars': 'Contains the bright star Regulus'
+                            },
+                            'Libra': {
+                                'description': 'The Scales - Represents the scales of justice in mythology.',
+                                'season': 'Best visible in late spring and early summer',
+                                'stars': 'Contains the stars Zubenelgenubi and Zubeneschamali'
+                            },
+                            'Pisces': {
+                                'description': 'The Fishes - A large but faint zodiac constellation.',
+                                'season': 'Best visible in autumn',
+                                'stars': 'Contains the stars Alrescha and Fum al Samakah'
+                            },
+                            'Sagittarius': {
+                                'description': 'The Archer - Contains the center of our Milky Way galaxy.',
+                                'season': 'Best visible in summer',
+                                'stars': 'Rich in star clusters and nebulae'
+                            },
+                            'Scorpius': {
+                                'description': 'The Scorpion - One of the most recognizable constellations.',
+                                'season': 'Best visible in summer',
+                                'stars': 'Contains the bright red star Antares'
+                            },
+                            'Taurus': {
+                                'description': 'The Bull - Contains the famous Pleiades star cluster.',
+                                'season': 'Best visible in winter',
+                                'stars': 'Notable for Aldebaran and the Pleiades cluster'
+                            },
+                            'Virgo': {
+                                'description': 'The Maiden - The second largest constellation in the sky.',
+                                'season': 'Best visible in spring and early summer',
+                                'stars': 'Contains the bright star Spica'
+                            }
+                        } %}
+                        
+                        {% set info = constellation_info[data.prediction.predicted_constellation] %}
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="info-item">
+                                    <i class="fas fa-book text-primary me-2"></i>
+                                    <strong>Description:</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <p>{{ info.description }}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="info-item">
+                                    <i class="fas fa-calendar text-success me-2"></i>
+                                    <strong>Best Season:</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <p>{{ info.season }}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="info-item">
+                                    <i class="fas fa-star text-warning me-2"></i>
+                                    <strong>Notable Features:</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <p>{{ info.stars }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-center">
+                <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-upload"></i>
+                    Analyze Another Image
+                </a>
+                <button class="btn btn-outline-secondary btn-lg" onclick="shareResults()">
+                    <i class="fas fa-share"></i>
+                    Share Results
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function shareResults() {
+    if (navigator.share) {
+        navigator.share({
+            title: 'AstroIdentify Results',
+            text: 'I identified a {{ data.prediction.predicted_constellation }} constellation with {{ data.prediction.confidence_percent }} confidence using AstroIdentify!',
+            url: window.location.href
+        });
+    } else {
+        // Fallback: copy to clipboard
+        const text = 'I identified a {{ data.prediction.predicted_constellation }} constellation with {{ data.prediction.confidence_percent }} confidence using AstroIdentify!';
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Results copied to clipboard!');
+        });
+    }
+}
+
+// Add smooth animations
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 200);
+    });
+});
+</script>
+{% endblock %}
