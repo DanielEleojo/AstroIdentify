@@ -44,4 +44,4 @@ Requires the trained weights (`constellation_best_model.pt`) and `constellation_
 
 ---
 
-Built by [Daniel Baba](https://linkedin.com/in/baba-daniel) — B.Sc. Computer Science (Math minor), Ontario Tech University.
+Built by [Daniel Baba](https://linkedin.com/in/baba-daniel) and [Clayton](https://github.com/ClaytonWas) — Ontario Tech University.
